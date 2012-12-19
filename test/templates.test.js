@@ -2,11 +2,31 @@ var
   express = require( 'express' ),
   chai    = require( 'chai' ),
   should  = chai.should(),
-  expect  = chai.expect;
+  expect  = chai.expect,
+  fs      = require('fs'),
+  path    = require('path'),
+  dir     = __dirname + '/html';
 
 var pEl = "<p><em>Lorem ipsum</em> dolor sit amet, consectetur adipisicing elit.</p>";
 var h1El = "<h1>Header 1</h1>";
 var scriptBody  = '<script>console.log(\'test\');</script>';
+var files;
+var load = function(){
+  files = {};
+  var list = fs
+    .readdirSync(dir)
+  var i = 0
+    , l = list.length
+    , file;
+
+    for(; i<l; i++){
+      file = path.join(dir, list[i]);
+      files[i] = fs.readFileSync(file, 'utf8');
+    }
+  return files;  
+}
+
+if(!files) load();
 
 describe( 'Templating', function () {
   it( 'should correctly compile markdown', function ( done ) {
@@ -16,8 +36,8 @@ describe( 'Templating', function () {
 
     poet.set({ posts: './test/_postsJson' }).init(function () {
       var posts = app._locals.postList;
-      posts[2].content.should.contain(pEl);
-      posts[2].content.should.contain(h1El);
+      posts[2].content.should.contain(files[0]);
+      posts[2].content.should.contain(files[1]);
       done();
     });
   });
